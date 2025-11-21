@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import * as foodService from '../services/foodService';
 import { FoodDatabaseItem, FoodItem } from '../types';
@@ -293,104 +294,121 @@ const AddFoodModal: React.FC<AddFoodModalProps> = ({ onClose, onSave, foodToEdit
     };
     
     const renderSearch = () => (
-        <>
-            <div className="flex items-center gap-2 mb-4">
+        <div className="flex flex-col h-full">
+            <div className="flex items-center gap-2 mb-4 flex-shrink-0">
                 <input
                     type="text"
                     placeholder="Buscar alimento..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    className="w-full bg-gray-700 p-2 rounded-md"
+                    className="w-full bg-gray-700 text-white p-3 rounded-lg border border-gray-600 focus:ring-2 focus:ring-blue-500 outline-none"
                     autoFocus
                 />
-                <button onClick={() => setView('create')} className="flex-shrink-0 bg-gray-600 hover:bg-gray-500 text-white font-semibold py-2 px-3 rounded-lg transition-colors text-sm">
-                    Novo
+                <button onClick={() => setView('create')} className="flex-shrink-0 bg-gray-700 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-lg transition-colors text-sm whitespace-nowrap border border-gray-600">
+                    + Novo
                 </button>
             </div>
-            <ul ref={listContainerRef} onScroll={handleScroll} className="flex-grow overflow-y-auto space-y-2 pr-2">
+            <ul ref={listContainerRef} onScroll={handleScroll} className="flex-grow overflow-y-auto space-y-2 pr-1 scrollbar-thin scrollbar-thumb-gray-600">
                  {error && (
-                    <li className="p-4 text-center text-red-400 bg-red-500/10 rounded-lg">
+                    <li className="p-4 text-center text-red-400 bg-red-500/10 rounded-lg border border-red-500/20">
                         <p className="font-semibold">Ocorreu um Erro</p>
                         <p className="text-sm mt-1">{error}</p>
                     </li>
                 )}
                  {!error && displayedFoods.map(food => (
-                    <li key={food.id} onClick={() => handleSelectFood(food)} className="p-3 bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-600 transition-colors">
-                        <p className="font-medium">{food.name}</p>
-                        <p className="text-xs text-gray-400">{food.calories} kcal por {food.servingSize}{food.servingUnit} ({food.unitName})</p>
+                    <li key={food.id} onClick={() => handleSelectFood(food)} className="p-4 bg-gray-700/50 rounded-xl cursor-pointer hover:bg-gray-700 active:bg-gray-600 transition-colors border border-gray-700">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <p className="font-medium text-white">{food.name}</p>
+                                <p className="text-xs text-gray-400 mt-1">Porção ref: {food.servingSize}{food.servingUnit} ({food.unitName})</p>
+                            </div>
+                            <span className="text-blue-400 font-bold text-sm">{Math.round(food.calories)} kcal</span>
+                        </div>
                     </li>
                 ))}
-                {isLoading && <li className="p-3 text-center text-gray-400">Carregando...</li>}
-                {!error && !hasMore && !searchTerm && <li className="p-3 text-center text-xs text-gray-500">Fim da lista.</li>}
-                {!error && debouncedSearchTerm && displayedFoods.length === 0 && !isLoading && <p className="text-gray-400 text-center py-4">Nenhum alimento encontrado.</p>}
+                {isLoading && <li className="p-4 text-center text-gray-400 animate-pulse">Carregando alimentos...</li>}
+                {!error && !hasMore && !searchTerm && <li className="p-4 text-center text-xs text-gray-500">Fim da lista.</li>}
+                {!error && debouncedSearchTerm && displayedFoods.length === 0 && !isLoading && (
+                    <div className="text-center py-8">
+                        <p className="text-gray-400 mb-2">Não encontramos "{searchTerm}"</p>
+                        <button onClick={() => setView('create')} className="text-blue-400 hover:underline font-medium">
+                            Criar este alimento manualmente
+                        </button>
+                    </div>
+                )}
             </ul>
-        </>
+        </div>
     );
     
     const renderCreate = () => (
-        <form onSubmit={handleCreateFoodSubmit} className="flex-grow flex flex-col space-y-3 overflow-y-auto pr-2">
-            <h4 className="text-lg font-semibold text-center mb-2">Criar Novo Alimento</h4>
-            {error && <p className="text-red-400 bg-red-500/10 p-2 rounded-md text-sm text-center">{error}</p>}
-            <div>
-                <label className="text-sm font-medium">Nome do Alimento</label>
-                <input type="text" name="name" value={newFoodData.name} onChange={handleCreateFoodChange} className="w-full bg-gray-700 p-2 rounded-md mt-1" required autoFocus />
-            </div>
+        <form onSubmit={handleCreateFoodSubmit} className="flex-grow flex flex-col space-y-4 overflow-y-auto pr-1 pb-2">
+            <h4 className="text-lg font-semibold text-center text-white flex-shrink-0">Criar Novo Alimento</h4>
+            {error && <p className="text-red-400 bg-red-500/10 p-3 rounded-lg text-sm text-center border border-red-500/20">{error}</p>}
             
-            <div className="border-t border-gray-700 pt-3">
-                <h5 className="text-sm font-semibold text-center mb-3 text-gray-400">Definição da Porção (Obrigatório)</h5>
-                <div className="grid grid-cols-2 gap-3">
-                    <div>
-                        <label className="text-sm font-medium">Nome da Unidade</label>
-                        <input
-                            type="text"
-                            name="unitName"
-                            placeholder="Ex: Fatia, Unidade"
-                            value={newFoodData.unitName}
-                            onChange={handleCreateFoodChange}
-                            className="w-full bg-gray-700 p-2 rounded-md mt-1"
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label className="text-sm font-medium">Quantidade em gramas (g)</label>
-                        <input
-                            type="number"
-                            step="0.1"
-                            name="servingSize"
-                            placeholder="Ex: 25"
-                            value={newFoodData.servingSize}
-                            onChange={handleCreateFoodChange}
-                            className="w-full bg-gray-700 p-2 rounded-md mt-1"
-                            required
-                        />
-                    </div>
-                </div>
-            </div>
-
-            <p className="text-xs text-gray-400 text-center pt-2">Insira os valores nutricionais para a porção informada acima</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-4 flex-grow">
                 <div>
-                    <label className="text-sm font-medium">Calorias (kcal)</label>
-                    <input type="number" name="calories" value={newFoodData.calories} onChange={handleCreateFoodChange} className="w-full bg-gray-700 p-2 rounded-md mt-1" required />
+                    <label className="text-sm font-medium text-gray-300">Nome do Alimento</label>
+                    <input type="text" name="name" value={newFoodData.name} onChange={handleCreateFoodChange} className="w-full bg-gray-700 text-white p-3 rounded-lg mt-1 border border-gray-600 focus:ring-2 focus:ring-blue-500 outline-none" required autoFocus placeholder="Ex: Pão Caseiro" />
                 </div>
-                 <div>
-                    <label className="text-sm font-medium">Proteínas (g)</label>
-                    <input type="number" step="0.1" name="protein" value={newFoodData.protein} onChange={handleCreateFoodChange} className="w-full bg-gray-700 p-2 rounded-md mt-1" required />
+                
+                <div className="bg-gray-700/30 p-4 rounded-xl border border-gray-700">
+                    <h5 className="text-sm font-semibold mb-3 text-blue-400 uppercase tracking-wider">Definição da Porção</h5>
+                    <div className="grid grid-cols-2 gap-3">
+                        <div>
+                            <label className="text-xs text-gray-400 block mb-1">Unidade (Ex: Fatia)</label>
+                            <input
+                                type="text"
+                                name="unitName"
+                                placeholder="Ex: Fatia"
+                                value={newFoodData.unitName}
+                                onChange={handleCreateFoodChange}
+                                className="w-full bg-gray-700 text-white p-3 rounded-lg border border-gray-600 focus:ring-blue-500 outline-none"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="text-xs text-gray-400 block mb-1">Peso em Gramas</label>
+                            <input
+                                type="number"
+                                step="0.1"
+                                name="servingSize"
+                                placeholder="Ex: 30"
+                                value={newFoodData.servingSize}
+                                onChange={handleCreateFoodChange}
+                                className="w-full bg-gray-700 text-white p-3 rounded-lg border border-gray-600 focus:ring-blue-500 outline-none"
+                                required
+                            />
+                        </div>
+                    </div>
                 </div>
-                 <div>
-                    <label className="text-sm font-medium">Carboidratos (g)</label>
-                    <input type="number" step="0.1" name="carbs" value={newFoodData.carbs} onChange={handleCreateFoodChange} className="w-full bg-gray-700 p-2 rounded-md mt-1" required />
-                </div>
-                 <div>
-                    <label className="text-sm font-medium">Gorduras (g)</label>
-                    <input type="number" step="0.1" name="fat" value={newFoodData.fat} onChange={handleCreateFoodChange} className="w-full bg-gray-700 p-2 rounded-md mt-1" required />
+
+                <div className="bg-gray-700/30 p-4 rounded-xl border border-gray-700">
+                    <h5 className="text-sm font-semibold mb-3 text-green-400 uppercase tracking-wider">Macros (por porção)</h5>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="text-xs text-gray-400 block mb-1">Calorias (kcal)</label>
+                            <input type="number" name="calories" value={newFoodData.calories} onChange={handleCreateFoodChange} className="w-full bg-gray-700 text-white p-3 rounded-lg border border-gray-600 focus:ring-blue-500 outline-none" required />
+                        </div>
+                        <div>
+                            <label className="text-xs text-gray-400 block mb-1">Proteínas (g)</label>
+                            <input type="number" step="0.1" name="protein" value={newFoodData.protein} onChange={handleCreateFoodChange} className="w-full bg-gray-700 text-white p-3 rounded-lg border border-gray-600 focus:ring-blue-500 outline-none" required />
+                        </div>
+                        <div>
+                            <label className="text-xs text-gray-400 block mb-1">Carboidratos (g)</label>
+                            <input type="number" step="0.1" name="carbs" value={newFoodData.carbs} onChange={handleCreateFoodChange} className="w-full bg-gray-700 text-white p-3 rounded-lg border border-gray-600 focus:ring-blue-500 outline-none" required />
+                        </div>
+                        <div>
+                            <label className="text-xs text-gray-400 block mb-1">Gorduras (g)</label>
+                            <input type="number" step="0.1" name="fat" value={newFoodData.fat} onChange={handleCreateFoodChange} className="w-full bg-gray-700 text-white p-3 rounded-lg border border-gray-600 focus:ring-blue-500 outline-none" required />
+                        </div>
+                    </div>
                 </div>
             </div>
 
-             <div className="flex justify-end gap-3 pt-4">
-                 <button type="button" onClick={() => { setView('search'); setError(null); }} className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-500">Voltar</button>
-                 <button type="submit" disabled={isSubmitting} className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500">
-                    {isSubmitting ? 'Salvando...' : 'Salvar e Selecionar'}
+             <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-2 mt-auto border-t border-gray-700 pt-4 flex-shrink-0">
+                 <button type="button" onClick={() => { setView('search'); setError(null); }} className="w-full sm:w-auto px-4 py-3 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-medium transition-colors">Voltar</button>
+                 <button type="submit" disabled={isSubmitting} className="w-full sm:w-auto px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition-colors disabled:bg-gray-600 disabled:opacity-50">
+                    {isSubmitting ? 'Salvando...' : 'Salvar Alimento'}
                  </button>
              </div>
         </form>
@@ -401,59 +419,69 @@ const AddFoodModal: React.FC<AddFoodModalProps> = ({ onClose, onSave, foodToEdit
          if (selectedFood?.mlToGRatio) unitOptions.splice(1, 0, 'ml');
 
         return (
-            <div className="flex-grow flex flex-col items-center py-4">
-                <h4 className="text-2xl font-bold mb-2 text-center">{selectedFood!.name}</h4>
-                <p className="text-gray-400 mb-4 text-center text-sm">
-                    Macros por porção de {selectedFood!.servingSize}g ({selectedFood!.unitName || 'porção'}): 
-                    P: {selectedFood!.protein}g, C: {selectedFood!.carbs}g, F: {selectedFood!.fat}g
-                </p>
+            <div className="flex-grow flex flex-col items-center overflow-y-auto pr-1">
+                <div className="text-center mb-6 flex-shrink-0">
+                    <h4 className="text-2xl font-bold text-white mb-1">{selectedFood!.name}</h4>
+                    <div className="inline-block bg-gray-700/50 rounded-full px-3 py-1 text-xs text-gray-400 border border-gray-700">
+                        Base: {selectedFood!.servingSize}g ({selectedFood!.unitName || 'porção'})
+                    </div>
+                </div>
                 
-                <div className="flex items-center justify-center gap-2 my-4">
+                {/* Seletor de Unidade - Mobile Friendly */}
+                <div className="flex flex-wrap justify-center gap-2 mb-6 w-full flex-shrink-0">
                     {unitOptions.map(unit => (
                         <button
                             key={unit}
                             onClick={() => setSelectedUnit(unit as any)}
-                            className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
-                                selectedUnit === unit ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
+                            className={`px-4 py-3 rounded-lg text-sm font-semibold transition-all flex-1 sm:flex-none min-w-[80px] ${
+                                selectedUnit === unit 
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50 ring-2 ring-blue-400 ring-offset-2 ring-offset-gray-800' 
+                                : 'bg-gray-700 text-gray-300 hover:bg-gray-600 border border-gray-600'
                             }`}
                         >
-                            {unit === 'unidade' ? selectedFood!.unitName || 'unidade' : unit}
+                            {unit === 'unidade' ? (selectedFood!.unitName || 'unidade') : unit}
                         </button>
                     ))}
                 </div>
 
-                <div className="w-full max-w-xs mt-4">
-                     <label className="block text-sm font-medium text-gray-300 text-center">
+                <div className="w-full max-w-xs mb-8 flex-shrink-0">
+                     <label className="block text-sm font-medium text-gray-300 text-center mb-2">
                         Quantidade ({selectedUnit === 'unidade' ? selectedFood!.unitName || 'unidade' : selectedUnit})
                      </label>
-                     <input
-                        type="number"
-                        value={quantity}
-                        onChange={e => setQuantity(parseFloat(e.target.value) || 0)}
-                        className="mt-1 w-full bg-gray-700 p-3 text-center text-xl rounded-md"
-                        autoFocus
-                        onFocus={(e) => e.target.select()}
-                     />
+                     <div className="relative">
+                        <input
+                            type="number"
+                            value={quantity}
+                            onChange={e => setQuantity(parseFloat(e.target.value) || 0)}
+                            className="w-full bg-gray-700 text-white p-4 text-center text-3xl font-bold rounded-2xl border border-gray-600 focus:ring-4 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
+                            autoFocus
+                            onFocus={(e) => e.target.select()}
+                        />
+                     </div>
                 </div>
 
-                <div className="w-full max-w-md bg-gray-700/50 p-4 rounded-lg mt-6">
-                    <h5 className="text-center font-bold text-lg mb-3">Valores Nutricionais Calculados</h5>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                        <div>
-                            <p className="text-xs text-gray-400">Calorias</p>
-                            <p className="text-xl font-bold text-blue-400">{calculatedMacros.calories} <span className="text-sm">kcal</span></p>
+                <div className="w-full bg-gray-700/30 p-5 rounded-2xl border border-gray-700 mb-4 flex-shrink-0">
+                    <h5 className="text-center font-medium text-gray-400 text-sm mb-4 uppercase tracking-wide">Resumo Nutricional</h5>
+                    <div className="grid grid-cols-4 gap-2 text-center">
+                        <div className="bg-gray-800/80 p-2 rounded-lg">
+                            <p className="text-xs text-gray-500 mb-1">Calorias</p>
+                            <p className="text-lg sm:text-xl font-bold text-blue-400 leading-none">{calculatedMacros.calories}</p>
+                            <span className="text-[10px] text-gray-600">kcal</span>
                         </div>
-                        <div>
-                            <p className="text-xs text-gray-400">Proteínas</p>
-                            <p className="text-xl font-bold text-red-400">{calculatedMacros.protein} <span className="text-sm">g</span></p>
+                        <div className="bg-gray-800/80 p-2 rounded-lg">
+                            <p className="text-xs text-gray-500 mb-1">Prot</p>
+                            <p className="text-lg sm:text-xl font-bold text-red-400 leading-none">{calculatedMacros.protein}</p>
+                            <span className="text-[10px] text-gray-600">g</span>
                         </div>
-                        <div>
-                            <p className="text-xs text-gray-400">Carbs</p>
-                            <p className="text-xl font-bold text-green-400">{calculatedMacros.carbs} <span className="text-sm">g</span></p>
+                        <div className="bg-gray-800/80 p-2 rounded-lg">
+                            <p className="text-xs text-gray-500 mb-1">Carb</p>
+                            <p className="text-lg sm:text-xl font-bold text-green-400 leading-none">{calculatedMacros.carbs}</p>
+                            <span className="text-[10px] text-gray-600">g</span>
                         </div>
-                        <div>
-                            <p className="text-xs text-gray-400">Gorduras</p>
-                            <p className="text-xl font-bold text-yellow-400">{calculatedMacros.fat} <span className="text-sm">g</span></p>
+                        <div className="bg-gray-800/80 p-2 rounded-lg">
+                            <p className="text-xs text-gray-500 mb-1">Gord</p>
+                            <p className="text-lg sm:text-xl font-bold text-yellow-400 leading-none">{calculatedMacros.fat}</p>
+                            <span className="text-[10px] text-gray-600">g</span>
                         </div>
                     </div>
                 </div>
@@ -466,8 +494,8 @@ const AddFoodModal: React.FC<AddFoodModalProps> = ({ onClose, onSave, foodToEdit
             return (
                 <div className="flex-grow flex items-center justify-center">
                     <div className="text-center">
-                        <div className="w-8 h-8 border-2 border-blue-400 border-dashed rounded-full animate-spin mx-auto"></div>
-                        <p className="mt-2 text-gray-400">Carregando dados do alimento...</p>
+                        <div className="w-10 h-10 border-4 border-blue-500 border-dashed rounded-full animate-spin mx-auto mb-3"></div>
+                        <p className="text-gray-400 animate-pulse">Buscando dados...</p>
                     </div>
                 </div>
             );
@@ -476,7 +504,7 @@ const AddFoodModal: React.FC<AddFoodModalProps> = ({ onClose, onSave, foodToEdit
             return renderQuantity();
         }
         if (view === 'create') {
-            return renderCreate();
+            return renderCreate(); // The create view manages its own layout/scroll
         }
         return renderSearch();
     };
@@ -484,11 +512,21 @@ const AddFoodModal: React.FC<AddFoodModalProps> = ({ onClose, onSave, foodToEdit
     const renderFooter = () => {
         if (selectedFood) {
              return (
-                 <div className="flex justify-end gap-3 mt-6 border-t border-gray-700 pt-4">
-                     <button onClick={onClose} className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-500">Cancelar</button>
-                    <button onClick={() => { setSelectedFood(null); setSearchTerm(''); }} className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-500">Voltar à Busca</button>
-                    <button onClick={handleSaveFood} className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700">
-                        {foodToEdit ? 'Salvar Alterações' : 'Adicionar'}
+                 <div className="flex flex-row items-center gap-3 mt-auto pt-4 border-t border-gray-700 flex-shrink-0">
+                    <button 
+                        onClick={() => { setSelectedFood(null); setSearchTerm(''); }} 
+                        className="p-3 rounded-lg bg-gray-700 hover:bg-gray-600 text-white transition-colors flex-shrink-0"
+                        title="Voltar"
+                    >
+                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                        </svg>
+                    </button>
+                    <button 
+                        onClick={handleSaveFood} 
+                        className="flex-grow py-3 px-6 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold shadow-lg shadow-blue-900/50 transition-all transform active:scale-95"
+                    >
+                        {foodToEdit ? 'Salvar' : 'Adicionar'}
                     </button>
                 </div>
              );
@@ -496,22 +534,32 @@ const AddFoodModal: React.FC<AddFoodModalProps> = ({ onClose, onSave, foodToEdit
         if (view === 'create') {
             return null; // The form has its own footer buttons
         }
-        // Search view footer
-        return (
-            <div className="flex justify-end gap-3 mt-6 border-t border-gray-700 pt-4">
-                <button onClick={onClose} className="px-4 py-2 rounded-md bg-gray-600 hover:bg-gray-500">Fechar</button>
-            </div>
-        );
+        // Search view - botão fechar removido pois agora temos o X no topo
+        return null; 
     }
     
     return (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4" onClick={onClose}>
-            <div className="bg-gray-800 rounded-xl p-6 w-full max-w-lg border border-gray-700 flex flex-col h-[600px]" onClick={e => e.stopPropagation()}>
-                <h3 className="text-xl font-bold mb-4">
-                    {selectedFood ? (foodToEdit ? "Editar Alimento" : "Adicionar Alimento") : (view === 'create' ? 'Adicionar Novo Alimento' : 'Buscar Alimento')}
-                </h3>
-                {renderContent()}
-                {renderFooter()}
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={onClose}>
+            {/* Modal centralizado com margens visíveis (p-4 no pai) e altura fixa de 80vh no mobile */}
+            <div 
+                className="bg-gray-800 w-full max-w-lg h-[80vh] sm:h-[600px] rounded-2xl border border-gray-700 flex flex-col shadow-2xl overflow-hidden" 
+                onClick={e => e.stopPropagation()}
+            >
+                <div className="p-4 sm:p-6 border-b border-gray-700 bg-gray-800 z-10 flex-shrink-0 flex justify-between items-center">
+                     <h3 className="text-xl font-bold text-white truncate">
+                        {selectedFood ? (foodToEdit ? "Editar Alimento" : "Adicionar Quantidade") : (view === 'create' ? 'Cadastro Manual' : 'Buscar Alimento')}
+                    </h3>
+                    <button onClick={onClose} className="text-gray-400 hover:text-white p-2 rounded-full hover:bg-gray-700 transition-colors">
+                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                
+                <div className="flex-grow overflow-hidden flex flex-col p-4 sm:p-6 bg-gray-800">
+                    {renderContent()}
+                    {renderFooter()}
+                </div>
             </div>
         </div>
     );
