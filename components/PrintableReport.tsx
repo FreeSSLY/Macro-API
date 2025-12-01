@@ -203,7 +203,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ profile, logs, histor
                                 <LogoIcon className="w-10 h-10 text-blue-600" />
                                 <div>
                                     <h1 className="text-xl font-bold text-black uppercase tracking-tight">Relatório de Performance</h1>
-                                    <p className="text-xs text-gray-500">Macro Tracker AI Analysis</p>
+                                    <p className="text-xs text-gray-500">Macro Tracker Analysis</p>
                                 </div>
                             </div>
                             <div className="text-right">
@@ -350,7 +350,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ profile, logs, histor
                         
                         <div className="mt-auto pt-4 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
                             <p>Macro Tracker AI &copy; {new Date().getFullYear()}</p>
-                            <p>Relatório gerado automaticamente.</p>
+                            <p>Relatório gerado automaticamente. Visite: <a>yancarvalhodev.com.br</a></p>
                         </div>
                     </div>
                 </div>
