@@ -198,7 +198,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ profile, logs, histor
                         }}
                     >
                         {/* Header */}
-                        <div className="flex justify-between items-start border-b-2 border-blue-600 pb-3 mb-4">
+                        <div className="flex justify-between items-start border-b-2 border-blue-600 pb-3 mb-3">
                             <div className="flex items-center gap-3">
                                 <LogoIcon className="w-10 h-10 text-blue-600" />
                                 <div>
@@ -227,7 +227,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ profile, logs, histor
                         </section>
 
                         {/* Section 2: Charts - Stacked Vertically */}
-                        <div className="flex flex-col gap-4 mb-6">
+                        <div className="flex flex-col gap-4 mb-4">
                              {/* Progress Chart */}
                             <div className="bg-white border border-gray-200 rounded-xl p-3 shadow-sm w-full">
                                 <h3 className="text-xs font-bold text-gray-600 mb-2 uppercase text-center">Consumo (Últimos 7 Dias)</h3>
@@ -252,7 +252,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ profile, logs, histor
                         </div>
 
                         {/* Section 3: Detailed History Table (First and Last Only) */}
-                        <section className="mb-6">
+                        <section className="mb-4">
                             <h3 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
                                 <span className="w-1 h-4 bg-green-600 rounded-full"></span>
                                 Comparativo (Início vs. Atual)
