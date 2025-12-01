@@ -223,8 +223,8 @@ const App: React.FC = () => {
         return <LeanMassCalculator profile={profile} currentWeight={currentWeight} history={bodyCompositionHistory} setHistory={handleSetHistory} />;
       case 'weight':
         return <UpdateMeasurements profile={profile} macroGoals={macroGoals} onProfileUpdate={handleProfileUpdate} />;
-      // case 'workout':
-      //   return <WorkoutPlanner />;
+      case 'workout':
+        return <WorkoutPlanner />;
       default:
         return <MacroTracker logs={logs} setLogs={handleSetLogs} macroGoals={macroGoals} setCustomGoals={handleSetCustomGoals} />;
     }
@@ -286,7 +286,7 @@ const App: React.FC = () => {
       <nav className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-2 grid grid-cols-5 gap-1 z-20 md:hidden">
         <NavItem currentView={view} viewName="tracker" icon={<TrackerIcon className="w-6 h-6" />} label="Diário" />
         <NavItem currentView={view} viewName="progress" icon={<ChartIcon className="w-6 h-6" />} label="Progresso" />
-        <NavItem currentView={view} viewName="workout" icon={<DumbbellIcon className="w-6 h-6" />} label="Treino" />
+        {/* <NavItem currentView={view} viewName="workout" icon={<DumbbellIcon className="w-6 h-6" />} label="Treino" /> */}
         <NavItem currentView={view} viewName="weight" icon={<WeightIcon className="w-6 h-6" />} label="Peso" />
         <NavItem currentView={view} viewName="calculator" icon={<CalculatorIcon className="w-6 h-6" />} label="Cálculos" />
       </nav>
@@ -296,7 +296,7 @@ const App: React.FC = () => {
         <LogoIcon className="w-10 h-10 text-blue-500 mb-4"/>
         <NavItem currentView={view} viewName="tracker" icon={<TrackerIcon className="w-7 h-7" />} label="Diário" />
         <NavItem currentView={view} viewName="progress" icon={<ChartIcon className="w-7 h-7" />} label="Progresso" />
-        <NavItem currentView={view} viewName="workout" icon={<DumbbellIcon className="w-7 h-7" />} label="Treino" />
+        {/* <NavItem currentView={view} viewName="workout" icon={<DumbbellIcon className="w-7 h-7" />} label="Treino" /> */}
         <NavItem currentView={view} viewName="weight" icon={<WeightIcon className="w-7 h-7" />} label="Peso" />
         <NavItem currentView={view} viewName="calculator" icon={<CalculatorIcon className="w-7 h-7" />} label="Cálculos" />
       </nav>
