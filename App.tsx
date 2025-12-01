@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { UserProfile as UserProfileType, DailyLog, MacroGoals, BodyCompositionLog } from './types';
@@ -8,11 +9,14 @@ import MacroTracker from './components/MacroTracker';
 import ProgressChart from './components/ProgressChart';
 import LeanMassCalculator from './components/LeanMassCalculator';
 import UpdateMeasurements from './components/CurrentWeight';
-import { LogoIcon, ChartIcon, CalculatorIcon, TrackerIcon, WeightIcon, LogoutIcon } from './components/Icons';
+import WorkoutPlanner from './components/WorkoutPlanner';
+import ProfileSettingsModal from './components/ProfileSettingsModal';
+import PrintableReport from './components/PrintableReport';
+import { LogoIcon, ChartIcon, CalculatorIcon, TrackerIcon, WeightIcon, LogoutIcon, DumbbellIcon, UserIcon } from './components/Icons';
 import { calculateTDEE } from './utils/calculations';
 import { supabase } from './supabaseClient';
 
-type View = 'tracker' | 'progress' | 'calculator' | 'weight';
+type View = 'tracker' | 'progress' | 'calculator' | 'weight' | 'workout';
 
 const App: React.FC = () => {
   const [session, setSession] = useState<Session | null>(null);
@@ -23,6 +27,8 @@ const App: React.FC = () => {
   const [bodyCompositionHistory, setBodyCompositionHistory] = useState<BodyCompositionLog[]>([]);
   const [view, setView] = useState<View>('tracker');
   const [loading, setLoading] = useState(true);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isPrintView, setIsPrintView] = useState(false);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -33,6 +39,7 @@ const App: React.FC = () => {
         setBodyCompositionHistory([]);
         setCurrentWeight(0);
         setCustomGoals(null);
+        setIsPrintView(false);
       }
       setLoading(false);
     });
@@ -194,6 +201,18 @@ const App: React.FC = () => {
     return <UserProfile onSave={handleProfileSave} />;
   }
 
+  if (isPrintView) {
+      return (
+          <PrintableReport 
+            profile={profile} 
+            logs={logs} 
+            history={bodyCompositionHistory} 
+            macroGoals={macroGoals}
+            onClose={() => setIsPrintView(false)} 
+          />
+      );
+  }
+
   const renderView = () => {
     switch (view) {
       case 'tracker':
@@ -204,6 +223,8 @@ const App: React.FC = () => {
         return <LeanMassCalculator profile={profile} currentWeight={currentWeight} history={bodyCompositionHistory} setHistory={handleSetHistory} />;
       case 'weight':
         return <UpdateMeasurements profile={profile} macroGoals={macroGoals} onProfileUpdate={handleProfileUpdate} />;
+      case 'workout':
+        return <WorkoutPlanner />;
       default:
         return <MacroTracker logs={logs} setLogs={handleSetLogs} macroGoals={macroGoals} setCustomGoals={handleSetCustomGoals} />;
     }
@@ -222,25 +243,39 @@ const App: React.FC = () => {
       }`}
     >
       {icon}
-      <span className="text-xs font-medium">{label}</span>
+      <span className="text-[10px] md:text-xs font-medium">{label}</span>
     </button>
   );
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
+       {isProfileModalOpen && (
+          <ProfileSettingsModal 
+            initialProfile={profile} 
+            onUpdateProfile={handleProfileUpdate} 
+            onClose={() => setIsProfileModalOpen(false)} 
+            onOpenReport={() => { setIsProfileModalOpen(false); setIsPrintView(true); }}
+          />
+       )}
        <header className="p-4 bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 flex items-center justify-between sticky top-0 z-20">
         <div className="flex items-center space-x-3">
           <LogoIcon className="w-8 h-8 text-blue-500" />
           <h1 className="text-xl font-bold text-white">Macro Tracker AI</h1>
         </div>
         <div className="flex items-center gap-4">
-             <div className="text-right">
+             <div className="text-right hidden sm:block">
                 <p className="text-sm text-gray-300">{profile.name}</p>
                 <p className="text-xs text-gray-400">{currentWeight} kg · {profile.height} cm</p>
             </div>
-            <button onClick={handleLogout} title="Sair" className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors">
-                <LogoutIcon className="w-6 h-6"/>
-            </button>
+            
+            <div className="flex items-center gap-2">
+                <button onClick={() => setIsProfileModalOpen(true)} title="Meu Perfil" className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors">
+                    <UserIcon className="w-6 h-6"/>
+                </button>
+                <button onClick={handleLogout} title="Sair" className="p-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-700 transition-colors">
+                    <LogoutIcon className="w-6 h-6"/>
+                </button>
+            </div>
         </div>
       </header>
       
@@ -248,9 +283,10 @@ const App: React.FC = () => {
         {renderView()}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-2 grid grid-cols-4 gap-1 z-20 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-2 grid grid-cols-5 gap-1 z-20 md:hidden">
         <NavItem currentView={view} viewName="tracker" icon={<TrackerIcon className="w-6 h-6" />} label="Diário" />
         <NavItem currentView={view} viewName="progress" icon={<ChartIcon className="w-6 h-6" />} label="Progresso" />
+        <NavItem currentView={view} viewName="workout" icon={<DumbbellIcon className="w-6 h-6" />} label="Treino" />
         <NavItem currentView={view} viewName="weight" icon={<WeightIcon className="w-6 h-6" />} label="Peso" />
         <NavItem currentView={view} viewName="calculator" icon={<CalculatorIcon className="w-6 h-6" />} label="Cálculos" />
       </nav>
@@ -260,6 +296,7 @@ const App: React.FC = () => {
         <LogoIcon className="w-10 h-10 text-blue-500 mb-4"/>
         <NavItem currentView={view} viewName="tracker" icon={<TrackerIcon className="w-7 h-7" />} label="Diário" />
         <NavItem currentView={view} viewName="progress" icon={<ChartIcon className="w-7 h-7" />} label="Progresso" />
+        <NavItem currentView={view} viewName="workout" icon={<DumbbellIcon className="w-7 h-7" />} label="Treino" />
         <NavItem currentView={view} viewName="weight" icon={<WeightIcon className="w-7 h-7" />} label="Peso" />
         <NavItem currentView={view} viewName="calculator" icon={<CalculatorIcon className="w-7 h-7" />} label="Cálculos" />
       </nav>

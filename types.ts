@@ -1,3 +1,4 @@
+
 export interface UserProfile {
   id?: string;
   name: string;
@@ -91,4 +92,28 @@ export interface FoodDatabaseItem {
   mlToGRatio?: number; // ex: para leite, 1ml é ~1.03g
   unitName?: string; // ex: 'unidade', 'fatia'
   unitToGRatio?: number; // ex: para um ovo, são ~55g. Deve ser igual ao servingSize se unitName for definido.
+}
+
+// Novos tipos para Treino
+export interface WorkoutExercise {
+  id: string;
+  name: string;
+  sets: number;
+  reps: string; // string para permitir intervalos "10-12"
+  weight?: string;
+  restTime?: string; // Tempo de descanso em segundos
+  muscleGroup?: string;
+  notes?: string;
+}
+
+export interface WeeklyWorkoutPlan {
+  [key: string]: {
+    title: string; // ex: "Treino A - Peito e Tríceps"
+    exercises: WorkoutExercise[];
+  };
+}
+
+export interface ExerciseDatabaseItem {
+  name: string;
+  muscleGroup: string;
 }
