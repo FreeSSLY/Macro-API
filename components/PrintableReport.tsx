@@ -348,9 +348,9 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ profile, logs, histor
                             </div>
                         </section>
                         
-                        <div className="mt-auto pt-4 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
-                            <p>Macro Tracker AI &copy; {new Date().getFullYear()}</p>
-                            <p>Relatório gerado automaticamente. Visite: <a>yancarvalhodev.com.br</a></p>
+                        <div className="mt-auto pt-1 border-t border-gray-200 flex justify-between items-center text-[10px] text-gray-400">
+                            <p>Macro Tracker &copy; {new Date().getFullYear()}</p>
+                            <p>Visite: <a>yancarvalhodev.com.br</a></p>
                         </div>
                     </div>
                 </div>
