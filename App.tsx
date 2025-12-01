@@ -223,8 +223,8 @@ const App: React.FC = () => {
         return <LeanMassCalculator profile={profile} currentWeight={currentWeight} history={bodyCompositionHistory} setHistory={handleSetHistory} />;
       case 'weight':
         return <UpdateMeasurements profile={profile} macroGoals={macroGoals} onProfileUpdate={handleProfileUpdate} />;
-      case 'workout':
-        return <WorkoutPlanner />;
+      // case 'workout':
+      //   return <WorkoutPlanner />;
       default:
         return <MacroTracker logs={logs} setLogs={handleSetLogs} macroGoals={macroGoals} setCustomGoals={handleSetCustomGoals} />;
     }
