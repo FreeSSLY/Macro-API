@@ -213,7 +213,7 @@ const PrintableReport: React.FC<PrintableReportProps> = ({ profile, logs, histor
                         </div>
 
                         {/* Section 1: Dashboard Stats */}
-                        <section className="mb-6">
+                        <section className="mb-3">
                             <h3 className="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
                                 <span className="w-1 h-4 bg-blue-600 rounded-full"></span>
                                 Resumo Atual
