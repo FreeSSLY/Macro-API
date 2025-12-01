@@ -283,7 +283,7 @@ const App: React.FC = () => {
         {renderView()}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-2 grid grid-cols-5 gap-1 z-20 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 bg-gray-800 border-t border-gray-700 p-2 grid grid-cols-4 gap-1 z-20 md:hidden">
         <NavItem currentView={view} viewName="tracker" icon={<TrackerIcon className="w-6 h-6" />} label="Diário" />
         <NavItem currentView={view} viewName="progress" icon={<ChartIcon className="w-6 h-6" />} label="Progresso" />
         {/* <NavItem currentView={view} viewName="workout" icon={<DumbbellIcon className="w-6 h-6" />} label="Treino" /> */}
