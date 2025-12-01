@@ -1,12 +1,14 @@
+
 import React, { useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { BodyCompositionLog } from '../../types';
 
 interface BodyCompositionLineChartProps {
   history: BodyCompositionLog[];
+  theme?: 'dark' | 'light';
 }
 
-const BodyCompositionLineChart: React.FC<BodyCompositionLineChartProps> = ({ history }) => {
+const BodyCompositionLineChart: React.FC<BodyCompositionLineChartProps> = ({ history, theme = 'dark' }) => {
   const chartData = useMemo(() => {
     // Ordena o histórico por data para garantir que o gráfico seja exibido corretamente
     const sortedHistory = [...history].sort((a, b) => a.date.localeCompare(b.date));
@@ -23,22 +25,30 @@ const BodyCompositionLineChart: React.FC<BodyCompositionLineChartProps> = ({ his
     });
   }, [history]);
 
+  const isLight = theme === 'light';
+  const axisColor = isLight ? '#4a5568' : '#A0AEC0';
+  const gridColor = isLight ? '#cbd5e0' : '#4A5568'; // Darker for print
+  const textColor = isLight ? '#1a202c' : '#E2E8F0';
+  const tooltipBg = isLight ? '#ffffff' : '#2D3748';
+  const tooltipBorder = isLight ? '#cbd5e0' : '#4A5568';
+
   return (
     <ResponsiveContainer width="100%" height="100%">
         <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#4A5568" />
-            <XAxis dataKey="name" stroke="#A0AEC0" />
-            <YAxis yAxisId="left" stroke="#A0AEC0" unit="kg" domain={['dataMin - 5', 'dataMax + 5']} />
-            <YAxis yAxisId="right" orientation="right" stroke="#FBBF24" unit="%" domain={['dataMin - 2', 'dataMax + 2']} />
+            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+            <XAxis dataKey="name" stroke={axisColor} tick={{ fill: axisColor }} />
+            <YAxis yAxisId="left" stroke={axisColor} unit="kg" domain={['dataMin - 5', 'dataMax + 5']} tick={{ fill: axisColor }} />
+            <YAxis yAxisId="right" orientation="right" stroke="#d97706" unit="%" domain={['dataMin - 2', 'dataMax + 2']} tick={{ fill: '#d97706' }} />
             <Tooltip 
-                contentStyle={{ backgroundColor: '#2D3748', border: '1px solid #4A5568', borderRadius: '0.75rem' }}
-                labelStyle={{ color: '#E2E8F0' }}
+                contentStyle={{ backgroundColor: tooltipBg, border: `1px solid ${tooltipBorder}`, borderRadius: '0.75rem' }}
+                labelStyle={{ color: textColor, fontWeight: 'bold' }}
+                itemStyle={{ color: textColor }}
                 formatter={(value: number, name: string) => [`${value.toFixed(1)} ${name.includes('%') ? '%' : 'kg'}`, name]}
             />
-            <Legend wrapperStyle={{ paddingTop: '20px' }}/>
-            <Line yAxisId="left" type="monotone" dataKey="Massa Magra (kg)" stroke="#4ADE80" strokeWidth={2} activeDot={{ r: 8 }} dot={{r: 4}} />
-            <Line yAxisId="left" type="monotone" dataKey="Massa Gorda (kg)" stroke="#F87171" strokeWidth={2} dot={{r: 4}} />
-            <Line yAxisId="right" type="monotone" dataKey="% de Gordura (BF)" stroke="#FBBF24" strokeWidth={2} dot={{r: 4}} />
+            <Legend wrapperStyle={{ paddingTop: '20px', color: textColor }}/>
+            <Line yAxisId="left" type="monotone" dataKey="Massa Magra (kg)" stroke="#10b981" strokeWidth={2} activeDot={{ r: 8 }} dot={{r: 4}} />
+            <Line yAxisId="left" type="monotone" dataKey="Massa Gorda (kg)" stroke="#ef4444" strokeWidth={2} dot={{r: 4}} />
+            <Line yAxisId="right" type="monotone" dataKey="% de Gordura (BF)" stroke="#d97706" strokeWidth={2} dot={{r: 4}} />
         </LineChart>
     </ResponsiveContainer>
   );
