@@ -34,7 +34,7 @@ const BodyCompositionLineChart: React.FC<BodyCompositionLineChartProps> = ({ his
 
   return (
     <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={chartData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
+        <LineChart data={chartData} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
             <XAxis dataKey="name" stroke={axisColor} tick={{ fill: axisColor }} />
             <YAxis yAxisId="left" stroke={axisColor} unit="kg" domain={['dataMin - 5', 'dataMax + 5']} tick={{ fill: axisColor }} />
