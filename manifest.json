@@ -1,0 +1,15 @@
+{
+  "name": "Macro Tracker",
+  "short_name": "Macro Tracker",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121824",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "images/icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
